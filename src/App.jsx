@@ -4,6 +4,7 @@ import { Video, FileText, Globe, ShieldCheck, Wrench, MapPin, Mail, Phone, Send,
 import { C, LINKS, L, Head, Cards, Cta, Faq } from './ui.jsx'
 import { MeetAI, MeetSetup, HomeMeetSpotlight, HomeMeetFlow } from './MeetAI.jsx'
 import { EDocs, HomeEdocsSpotlight, TranslateMock } from './EDocs.jsx'
+import { applyHead } from './seo.js'
 
 const NAV = [['/meet-ai', 'Meet-AI'], ['/e-docs', 'E-Docs'], ['/services', 'Services'], ['/pricing', 'Pricing'], ['/roadmap', 'Roadmap'], ['/about', 'About']]
 
@@ -137,15 +138,19 @@ const Refund = () => <Doc title="Refund and Cancellation Policy" date="17 Octobe
 
 const PAGES = { '/': Home, '/meet-ai': MeetAI, '/meet-ai/setup': MeetSetup, '/e-docs': EDocs, '/services': Services, '/pricing': Pricing, '/roadmap': Roadmap, '/about': About, '/security': Security, '/contact': Support, '/terms': Terms, '/privacy': Privacy, '/refund': Refund }
 
-export default function App() {
-  const get = () => location.hash.replace(/^#/, '') || '/'
-  const [path, setPath] = useState(get()), [open, setOpen] = useState(false)
-  useEffect(() => { const f = () => { setPath(get()); setOpen(false); scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
+const norm = (p) => p.replace(/\/+$/, '') || '/'
+
+// `url` is passed when prerendering; in the browser the path comes from location
+export default function App({ url }) {
+  const get = () => norm(location.pathname)
+  const [path, setPath] = useState(() => url ?? get()), [open, setOpen] = useState(false)
+  useEffect(() => { const f = () => { setPath(get()); setOpen(false); scrollTo(0, 0) }; addEventListener('popstate', f); return () => removeEventListener('popstate', f) }, [])
+  useEffect(() => applyHead(path), [path])
   const Page = PAGES[path] || (() => <><Head t="Page not found" s="That address does not exist." /><div className="wrap"><L to="/" className="btn main">Back to home</L></div></>)
   return <>
     <nav className="nav"><div className="wrap">
       <L to="/" className="brand"><img src="/adligare-logo.png" alt="" />Adligare Tech</L>
-      <button className="burger" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X size={20} /> : <Menu size={20} />}</button>
+      <button className="burger" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>{open ? <X size={20} /> : <Menu size={20} />}</button>
       <div className={'links' + (open ? ' open' : '')}>{NAV.map(([p, t]) => <L key={p} to={p} className={path === p || path.startsWith(p + '/') ? 'on' : ''}>{t}</L>)}<L to="/contact" className="btn main">Contact us</L></div>
     </div></nav>
     <main><Page /></main>

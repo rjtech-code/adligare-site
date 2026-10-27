@@ -15,9 +15,9 @@ const FEED = [
   ['10:18', 'Aarav Mehta left', 'out'], ['10:21', 'Aarav Mehta rejoined (3m away)', 'in'],
 ]
 function LiveFeed() {
-  const [n, setN] = useState(reduced() ? FEED.length : 3)
+  const [n, setN] = useState(3)
   useEffect(() => {
-    if (reduced()) return
+    if (reduced()) return setN(FEED.length)
     const t = setInterval(() => setN((s) => (s >= FEED.length ? 3 : s + 1)), 1500)
     return () => clearInterval(t)
   }, [])
@@ -105,7 +105,7 @@ const COMPARE = [
   ['Time spent after the meeting', '15–30 minutes', 'None. The report is already there'],
 ]
 
-const MEET_FAQ = [
+export const MEET_FAQ = [
   ['Does Meet-AI record audio or video?', 'No. It reads only what is already shown on your screen: the participant list and tiles, raised hands and captions. Nothing is recorded.'],
   ['Do I need to be the host?', 'No. Anyone in the meeting can use it. If you are the host, your report gets an extra Host Analytics page.'],
   ['Which meetings does it track?', 'Any Google Meet or Zoom web call you join in Chrome while the extension is on. Meetings you have scheduled in your dashboard additionally get participant-list matching and absent alerts. Turn the extension off in Chrome when you do not want a meeting tracked.'],

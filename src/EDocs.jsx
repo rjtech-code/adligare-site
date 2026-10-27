@@ -9,10 +9,11 @@ import { LINKS, L, Faq, Cta } from './ui.jsx'
 
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// Real screenshots of the E-Docs app live in public/edocs/
-const Shot = ({ src, alt, url = 'e-docs', className = '' }) => <figure className={'shot ' + className}>
+// Real screenshots of the E-Docs app live in public/edocs/ (intrinsic sizes reserve layout space)
+const SIZE = { mobile: [780, 1688], 'merge-history': [1440, 1451] }
+const Shot = ({ src, alt, url = 'e-docs', className = '', eager }) => <figure className={'shot ' + className}>
   <div className="shot-bar"><i /><i /><i /><span>{url}</span></div>
-  <img src={`/edocs/${src}.webp`} alt={alt} loading="lazy" />
+  <img src={`/edocs/${src}.webp`} alt={alt} width={(SIZE[src] || [1440])[0]} height={(SIZE[src] || [0, 900])[1]} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
 </figure>
 
 // ── Data ────────────────────────────────────────────────────────────────────
@@ -87,7 +88,7 @@ const GUEST_VS = [
   ['Open your files again from another device', false, true],
 ]
 
-const EDOCS_FAQ = [
+export const EDOCS_FAQ = [
   ['Is E-Docs really free?', 'Yes. All 28 tools, including translation, are free. There is no watermark and no limit on how many times you use a tool.'],
   ['Do I need an account?', 'No. Every tool works as a guest. Sign in only if you want your output files saved so you can download them again later.'],
   ['Are my files uploaded?', 'Most tools run entirely inside your browser, so the file never leaves your device. Two exceptions: translation sends the text (not the file) to an online translation service, and PDF to Word may use our server converter for better layout, which deletes the file right after. If you are signed in, the finished output file is saved to your account.'],
@@ -163,7 +164,7 @@ export const EDocs = () => <>
       <div className="row"><a className="btn main" href={LINKS.edocsApp}>Open E-Docs <ArrowRight size={16} /></a><button className="btn" onClick={() => go('translate')}><Languages size={16} />See translation</button></div>
       <ul className="chips"><li><Check size={14} />100% free, no watermark</li><li><Monitor size={14} />Files processed in your browser</li><li><Check size={14} />No sign-up needed</li></ul>
     </div>
-    <Shot src="home" alt="E-Docs home screen showing PDF tools and the translate card" />
+    <Shot src="home" alt="E-Docs home screen showing PDF tools and the translate card" eager />
   </div></header>
 
   <SectionNav />
